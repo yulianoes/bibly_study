@@ -12,27 +12,21 @@ use App\Services\StudyPlanService;
 
 class BibleController extends Controller
 {
-    protected $searchService;
     protected $intentService;
     protected $aiService;
     protected $youtubeService;
     protected $studyPlanService;
-    protected $semanticService;
 
     public function __construct(
-        BibleSearchService $searchService,
         IntentDetectionService $intentService,
         AiExplanationService $aiService,
         YouTubeService $youtubeService,
-        StudyPlanService $studyPlanService,
-        \App\Services\SemanticSearchService $semanticService
+        StudyPlanService $studyPlanService
     ) {
-        $this->searchService = $searchService;
         $this->intentService = $intentService;
         $this->aiService = $aiService;
         $this->youtubeService = $youtubeService;
         $this->studyPlanService = $studyPlanService;
-        $this->semanticService = $semanticService;
     }
 
     public function query(Request $request)
@@ -50,18 +44,7 @@ class BibleController extends Controller
             : $query;
         $theme = ucfirst(trim($theme));
 
-        // 2. Chave de Cache única para este tema (normalizada: minúsculas, sem acentos)
-        $cacheKey = 'bible_study_' . md5(mb_strtolower(trim($theme)));
-
-        // 3. Retornar do cache se disponível (evita chamar a API repetidamente)
-        //    Cache dura 24 horas — perfeito para não esgotar a cota gratuita
-        $cachedResponse = Cache::get($cacheKey);
-        if ($cachedResponse) {
-            \Log::info("✓ Cache HIT para tema: '{$theme}'");
-            return response()->json($cachedResponse);
-        }
-
-        \Log::info("Cache MISS para tema: '{$theme}' — Chamando IA...");
+        \Log::info("✓ Processando tema: '{$theme}' — Chamando IA...");
 
         // 4. Detectar Intenção
         $intent = $this->intentService->detect($query);
