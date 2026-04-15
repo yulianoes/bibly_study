@@ -498,6 +498,30 @@
                 behavior: 'smooth'
             });
         }
+
+        // --- Web Security & Anti-DevTools ---
+        // 1. Desativar Clique Direito
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // 2. Desativar Atalhos de Teclado (F12, Ctrl+Shift+I, etc)
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) return false; // F12
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Ctrl+Shift+C
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+        };
+
+        // 3. Deteção de abertura de Consola (Dificulta a depuração)
+        setInterval(function() {
+            const before = new Date().getTime();
+            debugger;
+            const after = new Date().getTime();
+            if (after - before > 100) {
+                // Se o debugger parou a execução por mais de 100ms, DevTools está aberto
+                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;font-family:sans-serif;"><h1>Ambiente Seguro</h1><p>O uso de ferramentas de desenvolvedor não é permitido nesta plataforma.</p><button onclick="location.reload()" style="margin-top:1rem;padding:10px 20px;cursor:pointer;">Recarregar</button></div>';
+            }
+        }, 1000);
     </script>
 </body>
 
