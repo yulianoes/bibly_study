@@ -66,19 +66,13 @@ class BibleController extends Controller
         // 4. Detectar Intenção
         $intent = $this->intentService->detect($query);
 
-        // 5. Buscar Contexto no Banco de Dados
-        $context = $this->searchService->search($theme);
-
-        // 5.1 Expandir se o resultado estiver vazio
-        if (count($context['results']['verses']) === 0 && count($context['results']['commentaries']) === 0) {
-            $expandedTerms = $this->semanticService->expandQuery($query);
-            foreach ($expandedTerms as $term) {
-                $extraContext = $this->searchService->search($term);
-                $context['results']['commentaries'] = array_merge($context['results']['commentaries'], $extraContext['results']['commentaries']);
-                $context['results']['verses'] = array_merge($context['results']['verses'], $extraContext['results']['verses']);
-                if (count($context['results']['commentaries']) > 10) break;
-            }
-        }
+        // 5. Contexto vazio (ignora Base de Dados para evitar erro 500 no Render)
+        $context = [
+            'results' => [
+                'verses' => [],
+                'commentaries' => []
+            ]
+        ];
 
         // 6. Gerar Estudo com IA
         $aiResponse = $this->aiService->generate($context, $theme);

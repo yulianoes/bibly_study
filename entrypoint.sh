@@ -1,26 +1,18 @@
 #!/bin/bash
 
-echo "🚀 Iniciando Laravel..."
+echo "🚀 Iniciando Laravel (Stateless Mode)..."
 
-# Garantir permissões
+# Garantir permissões apenas para o que for estritamente necessário
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Limpar caches antes de gerar novos
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-
-# Cache para performance
+# Limpar e gerar caches (usando driver 'array' definido no .env)
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Rodar migrações automaticamente (importante para Render/Produção)
-php artisan migrate --force
-
-# Storage link
+# Link de storage
 php artisan storage:link || true
 
-echo "✅ Laravel pronto!"
+echo "✅ App pronta para o Render!"
 
 exec "$@"

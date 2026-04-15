@@ -8,7 +8,7 @@
 
     <link rel="canonical" href="https://bibly-efzy.onrender.com/">
     <meta name="robots" content="index, follow">
-    <meta name="google-site-verification" content="dsHb2hyKBUcX2YmoRqA8tjA0hrhlJGsvWuIs_Vyfjo4" />
+    <meta name="google-site-verification" content="OjkqE9D8QZHOFPm9kpNSrDKGTLHweqKOXNM7I0IWl2U" />
     <meta name="keywords" content="Bíblia, Teologia, IA, Inteligência Artificial, Estudo Bíblico, Exegese, Hermenêutica, Cristianismo">
 
     <!-- SEO & Social Media (OpenGraph) -->
