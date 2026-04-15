@@ -1,2 +1,4 @@
 User-agent: *
 Disallow:
+
+Sitemap: https://bibly-efzy.onrender.com/sitemap.xml

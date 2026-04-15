@@ -534,6 +534,28 @@
             });
         }
 
+        // --- Proteção Web Anti-DevTools ---
+        // 1. Desativar Clique Direito
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // 2. Desativar Atalhos comuns (F12, Ctrl+Shift+I, etc)
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) return false; // F12
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; 
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; 
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; 
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; 
+        };
+
+        // 3. Deteção de abertura de Consola (Ativa o ecrã de bloqueio)
+        setInterval(function() {
+            const before = new Date().getTime();
+            debugger;
+            const after = new Date().getTime();
+            if (after - before > 100) {
+                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;font-family:sans-serif;background:#0f172a;color:white;text-align:center;padding:2rem;"><h1>Ambiente Seguro Ativado</h1><p>O uso de ferramentas de diagnóstico não é permitido nesta plataforma.</p><button onclick="location.reload()" style="margin-top:1.5rem;padding:12px 24px;cursor:pointer;background:#6366f1;color:white;border:none;border-radius:4px;font-weight:600;">Recarregar Aplicação</button></div>';
+            }
+        }, 1000);
     </script>
 </body>
 
