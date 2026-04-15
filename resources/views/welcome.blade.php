@@ -5,6 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bible Intelligent Study</title>
+
+    <link rel="canonical" href="https://bibly-efzy.onrender.com/">
+    <meta name="robots" content="index, follow">
+    <meta name="google-site-verification" content="dsHb2hyKBUcX2YmoRqA8tjA0hrhlJGsvWuIs_Vyfjo4" />
+    <meta name="keywords" content="Bíblia, Teologia, IA, Inteligência Artificial, Estudo Bíblico, Exegese, Hermenêutica, Cristianismo">
+
+    <!-- SEO & Social Media (OpenGraph) -->
+    <meta name="description" content="Explore as profundezas da Teologia com Inteligência Artificial. Estudos bíblicos profissionais, mapas mentais e bibliografia multimédia.">
+    <meta property="og:title" content="Bible Intelligent Study - A Nova Era do Estudo Teológico">
+    <meta property="og:description" content="Use o poder da IA para aprofundar o seu conhecimento bíblico com alta erudição.">
+    <meta property="og:image" content="{{ asset('marketing_fb.png') }}">
+    <meta property="og:url" content="https://bibly-efzy.onrender.com/">
+    <meta property="og:type" content="website">
+
+    <!-- JSON-LD Structured Data for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Bible Intelligent Study",
+      "operatingSystem": "All",
+      "applicationCategory": "EducationalApplication",
+      "description": "Plataforma de IA para alta erudição teológica e estudos bíblicos profundos.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Yuliano Silva"
+      }
+    }
+    </script>
+
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
