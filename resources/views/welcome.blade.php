@@ -22,19 +22,19 @@
     <!-- JSON-LD Structured Data for Google -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
+      "@@context": "https://schema.org",
+      "@@type": "SoftwareApplication",
       "name": "Bible Intelligent Study",
       "operatingSystem": "All",
       "applicationCategory": "EducationalApplication",
       "description": "Plataforma de IA para alta erudição teológica e estudos bíblicos profundos.",
       "offers": {
-        "@type": "Offer",
+        "@@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       },
       "author": {
-        "@type": "Person",
+        "@@type": "Person",
         "name": "Yuliano Silva"
       }
     }
@@ -143,7 +143,7 @@
             z-index: 1000;
         }
 
-        @media (min-width: 600px) {
+        @@media (min-width: 600px) {
             .search-box {
                 flex-direction: row;
                 border-radius: 4px;
@@ -198,7 +198,7 @@
             display: none;
         }
 
-        @media print {
+        @@media print {
             body {
                 background: white !important;
                 color: black !important;
@@ -279,11 +279,11 @@
             animation: pulse-text 1.5s infinite;
         }
 
-        @keyframes shimmer {
+        @@keyframes shimmer {
             100% { left: 100%; }
         }
 
-        @keyframes pulse-text {
+        @@keyframes pulse-text {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
