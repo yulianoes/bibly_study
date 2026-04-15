@@ -109,13 +109,8 @@ class BibleController extends Controller
             $response['study_plan'] = $this->studyPlanService->generatePlan($context, $theme);
         }
 
-        // 10. Guardar no Cache (apenas se a IA respondeu com sucesso, não o fallback de erro)
-        //     Se a resposta não for de erro (ou seja, não contém o aviso de limite), guarda 24h
-        $isAiError = isset($aiResponse['details']) && str_contains($aiResponse['details'] ?? '', 'limite de requisições');
-        if (!$isAiError) {
-            Cache::put($cacheKey, $response, now()->addHours(24));
-            \Log::info("✓ Resposta guardada em cache por 24h para: '{$theme}'");
-        }
+        // 10. Cache desativado para evitar erros de base de dados em instâncias read-only
+        \Log::info("✓ Resposta gerada com sucesso para: '{$theme}'");
 
         return response()->json($response);
     }
