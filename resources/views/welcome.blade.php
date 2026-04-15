@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bible Intelligent Study</title>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -206,24 +207,50 @@
         }
 
         .loader {
-            width: 45px;
-            height: 45px;
-            border: 4px solid var(--border);
-            border-bottom-color: var(--primary);
-            border-radius: 4px;
             display: none;
-            margin: 2rem auto;
-            animation: rotate 0.8s linear infinite;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 3rem auto;
+            gap: 1.5rem;
         }
 
-        @keyframes rotate {
-            from {
-                transform: rotate(0deg);
-            }
+        .loader-shimmer {
+            width: 80px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
 
-            to {
-                transform: rotate(360deg);
-            }
+        .loader-shimmer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        .loader-text {
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            animation: pulse-text 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            100% { left: 100%; }
+        }
+
+        @keyframes pulse-text {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .tag {
@@ -316,7 +343,10 @@
             <button onclick="performSearch()">Pesquisar</button>
         </div>
 
-        <div id="loader" class="loader"></div>
+        <div id="loader" class="loader">
+            <div class="loader-shimmer"></div>
+            <div class="loader-text">Consultando Saber Sagrado...</div>
+        </div>
 
         <div id="results" style="display: none;">
             <!-- Cabeçalho de Impressão -->
@@ -394,7 +424,7 @@
             if (!query) return;
 
             document.getElementById('results').style.display = 'none';
-            document.getElementById('loader').style.display = 'block';
+            document.getElementById('loader').style.display = 'flex';
 
             try {
                 const response = await fetch('/api/query', {
