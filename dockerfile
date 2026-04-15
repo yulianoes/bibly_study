@@ -1,5 +1,5 @@
 # -------- STAGE 1: BUILD --------
-FROM php:8.2-cli AS builder
+FROM php:8.3-cli AS builder
 
 RUN apt-get update && apt-get install -y \
     curl git unzip libpq-dev libzip-dev libicu-dev \
@@ -32,7 +32,7 @@ RUN php artisan package:discover
 RUN npm run build
 
 # -------- STAGE 2: RUNTIME --------
-FROM php:8.2-apache
+FROM php:8.3-apache
 
 RUN apt-get update && apt-get install -y \
     libpq-dev libzip-dev libicu-dev zip unzip \
