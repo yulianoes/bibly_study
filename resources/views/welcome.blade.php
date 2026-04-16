@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bible Intelligent Study</title>
 
-    <link rel="canonical" href="https://bibly-efzy.onrender.com/">
+    <link rel="canonical" href="{{ config('app.url') }}">
     <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="OjkqE9D8QZHOFPm9kpNSrDKGTLHweqKOXNM7I0IWl2U" />
     <meta name="keywords"
@@ -19,8 +19,15 @@
     <meta property="og:description"
         content="Use o poder da IA para aprofundar o seu conhecimento bíblico com alta erudição.">
     <meta property="og:image" content="{{ asset('marketing_fb.png') }}">
-    <meta property="og:url" content="https://bibly-efzy.onrender.com/">
+    <meta property="og:url" content="{{ config('app.url') }}">
     <meta property="og:type" content="website">
+
+    <!-- PWA & Mobile Optimization -->
+    <meta name="theme-color" content="#92754d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Bible Study">
+    <link rel="apple-touch-icon" href="/favicon.png">
 
     <!-- JSON-LD Structured Data for Google -->
     <script type="application/ld+json">
@@ -59,7 +66,7 @@
             --primary: #92754d;
             --primary-glow: rgba(146, 117, 77, 0.1);
             --border: #e2e8f0;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --shadow: none;
         }
 
         :root[data-theme="dark"] {
@@ -70,7 +77,7 @@
             --primary: #d4af37;
             --primary-glow: rgba(212, 175, 55, 0.15);
             --border: #334155;
-            --shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
+            --shadow: none;
         }
 
         * {
@@ -93,8 +100,10 @@
             width: 100%;
             max-width: 850px;
             margin: 0 auto;
-            padding: 2rem 1.5rem;
-            min-height: 100vh;
+            padding: 2rem 1.5rem 6rem;
+            min-height: 100svh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Navbar & Header */
@@ -107,7 +116,7 @@
         .theme-toggle {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 4px;
             cursor: pointer;
             color: var(--text);
             width: 45px;
@@ -116,7 +125,7 @@
             align-items: center;
             justify-content: center;
             transition: 0.3s;
-            box-shadow: var(--shadow);
+            box-shadow: none;
         }
 
         .theme-toggle:hover {
@@ -150,10 +159,10 @@
             background: linear-gradient(135deg, #1e293b, var(--primary));
             color: white;
             padding: 2.5rem;
-            border-radius: 24px;
+            border-radius: 4px;
             margin-bottom: 3rem;
             position: relative;
-            box-shadow: var(--shadow);
+            box-shadow: none;
             overflow: hidden;
         }
 
@@ -176,16 +185,16 @@
         /* Search Pill - Glassmorphism */
         .search-pill {
             position: sticky;
-            top: 20px;
+            top: 80px;
             z-index: 1000;
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 100px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             padding: 0.35rem;
             margin-bottom: 3.5rem;
-            box-shadow: 0 15px 45px -10px rgba(0,0,0,0.1);
+            box-shadow: none;
             transition: 0.4s;
             max-width: 100%;
         }
@@ -225,7 +234,7 @@
             border: none;
             width: 50px;
             height: 50px;
-            border-radius: 50%;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -283,9 +292,9 @@
             cursor: pointer;
             padding: 1.2rem 1.8rem;
             background: var(--card-bg);
-            border-radius: 20px;
+            border-radius: 4px;
             border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+            box-shadow: none;
             transition: 0.3s;
         }
 
@@ -309,7 +318,7 @@
             background: var(--card-bg);
             border: 1px solid var(--border);
             padding: 1.5rem;
-            border-radius: 20px;
+            border-radius: 4px;
             cursor: pointer;
             transition: 0.3s;
             display: flex;
@@ -346,10 +355,10 @@
 
         .study-card {
             background: var(--card-bg);
-            border-radius: 32px;
+            border-radius: 4px;
             padding: 3rem;
             border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+            box-shadow: none;
             margin-bottom: 2rem;
         }
 
@@ -379,7 +388,7 @@
             margin: 3rem 0;
             padding: 2rem;
             background: var(--bg);
-            border-radius: 24px;
+            border-radius: 4px;
             border: 1px dashed var(--border);
         }
 
@@ -387,12 +396,12 @@
             background: var(--card-bg);
             border: 1px solid var(--primary);
             padding: 0.8rem 1.8rem;
-            border-radius: 100px;
+            border-radius: 4px;
             font-weight: 600;
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: var(--shadow);
+            box-shadow: none;
         }
 
         .connector {
@@ -407,7 +416,7 @@
             padding: 0.5rem 1.2rem;
             background: var(--primary-glow);
             color: var(--primary);
-            border-radius: 100px;
+            border-radius: 4px;
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
@@ -431,7 +440,7 @@
             width: 80px;
             height: 80px;
             background: var(--primary-glow);
-            border-radius: 50%;
+            border-radius: 4px;
             margin: 0 auto 2rem;
             animation: pulse-animation 1.5s infinite;
             display: flex;
@@ -507,7 +516,7 @@
             width: 100px;
             height: 100px;
             background: var(--primary-glow);
-            border-radius: 50%;
+            border-radius: 4px;
             margin-bottom: 2rem;
             animation: pulse-animation 1.5s infinite;
             display: flex;
@@ -518,7 +527,7 @@
         /* Premium Buttons */
         .btn-premium {
             padding: 1.2rem 2.5rem;
-            border-radius: 100px;
+            border-radius: 4px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -536,7 +545,7 @@
 
         .btn-premium:hover {
             transform: translateY(-3px);
-            box-shadow: var(--shadow);
+            box-shadow: none;
             border-color: var(--primary);
         }
 
@@ -581,11 +590,11 @@
 
             .study-card {
                 padding: 1.8rem;
-                border-radius: 32px;
+                border-radius: 4px;
             }
 
             .search-pill {
-                border-radius: 30px;
+                border-radius: 4px;
                 padding: 0.5rem;
             }
 
@@ -598,7 +607,7 @@
 
             .verse-banner {
                 padding: 1.5rem;
-                border-radius: 20px;
+                border-radius: 4px;
             }
 
             .daily-grid {
@@ -616,38 +625,94 @@
         }
 
         /* Premium Navbar */
-        .premium-nav { position:fixed; top:0; left:0; right:0; z-index:2000; background:rgba(var(--card-bg), 0.85); backdrop-filter:blur(15px); border-bottom:1px solid var(--border); padding:0.8rem 1.5rem; display:flex; justify-content:space-between; align-items:center; }
-        .nav-logo { font-weight:800; font-size:1rem; letter-spacing:-1px; color:var(--primary); text-transform:uppercase; }
-        .nav-links { display:flex; gap:1.2rem; align-items:center; }
-        .nav-link { font-size:0.65rem; text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--muted); cursor:pointer; }
-        .nav-link:hover { color:var(--primary); }
+        .premium-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 2000;
+            background: rgba(var(--card-bg), 0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: -1px;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
 
         @media (max-width: 600px) {
-            .premium-nav { padding:0.6rem 1rem; }
-            .nav-links { gap:0.8rem; }
-            .nav-link { font-size:0.6rem; letter-spacing:0.5px; }
-            .nav-logo { display:none; }
-            .container { padding:0.8rem; }
-            .search-pill { 
-                padding: 0.25rem; 
-                border-radius: 100px; 
-                width: 100% !important; 
-                box-sizing: border-box; 
+            .premium-nav {
+                padding: 0.6rem 1rem;
             }
-            .search-pill select { 
-                padding: 0 0.5rem; 
-                width: 65px; 
-                font-size: 0.65rem; 
+
+            .nav-links {
+                gap: 0.8rem;
+            }
+
+            .nav-link {
+                font-size: 0.6rem;
+                letter-spacing: 0.5px;
+            }
+
+            .nav-logo {
+                display: none;
+            }
+
+            .container {
+                padding: 0.8rem 0.8rem 6rem;
+            }
+
+            .search-pill {
+                padding: 0.25rem;
+                border-radius: 4px;
+                width: 100% !important;
+                box-sizing: border-box;
+                top: 65px;
+            }
+
+            .search-pill select {
+                padding: 0 0.5rem;
+                width: 65px;
+                font-size: 0.65rem;
                 border-right: 1px solid var(--border);
             }
-            .search-pill input { 
-                font-size: 0.95rem; 
-                padding: 0.6rem 0.5rem; 
+
+            .search-pill input {
+                font-size: 0.95rem;
+                padding: 0.6rem 0.5rem;
             }
-            .btn-study { 
-                width: 44px; 
-                height: 44px; 
-                min-width: 44px; 
+
+            .btn-study {
+                width: 44px;
+                height: 44px;
+                min-width: 44px;
                 font-size: 1rem;
             }
         }
@@ -741,7 +806,6 @@
 
             #print-header {
                 display: block !important;
-                border-bottom: 1px solid #000;
                 padding-bottom: 1cm;
                 margin-bottom: 1.5cm;
                 text-align: center;
@@ -763,7 +827,15 @@
                 display: none !important;
             }
 
-            /* Hide the grid of verses in print to keep it clean */
+            hr, .search-pill, .premium-nav, [style*="border-top"], [style*="border-bottom"] {
+                border: none !important;
+                display: none !important;
+            }
+            
+            article, .study-card {
+                border: none !important;
+                padding: 0 !important;
+            }
         }
     </style>
 </head>
@@ -775,7 +847,8 @@
             <span class="nav-link" onclick="toggleMenuSection('daily')">Temas</span>
             <span class="nav-link" onclick="toggleMenuSection('history')">Histórico</span>
             <span class="nav-link" onclick="toggleMenuSection('favs')">Favoritos</span>
-            <button class="theme-toggle" id="theme-toggle" style="width:35px; height:35px; border-radius:8px;"><i class="bi bi-sun"></i></button>
+            <button class="theme-toggle" id="theme-toggle" style="width:35px; height:35px; border-radius:4px;"><i
+                    class="bi bi-sun"></i></button>
         </div>
     </nav>
 
@@ -853,8 +926,7 @@
                 <p
                     style="text-transform:uppercase; letter-spacing:10px; font-weight:700; color:#555; font-size:0.8rem;">
                     Relatório de Exegese Teológica</p>
-                <div style="margin:2rem 0; border-top:1px solid #000; border-bottom:1px solid #000; padding:1rem 0;">
-                    <p><strong>Pesquisador:</strong> Yuliano Silva</p>
+                <div style="margin:2rem 0; padding:1rem 0;">
                     <p><strong>Data de Emissão:</strong> <span id="print-date"></span></p>
                     <div id="print-qrcode" style="margin:2rem auto; display:flex; justify-content:center;"></div>
                     <p id="print-url" style="font-size:0.7rem; color:#666; display:none;"></p>
@@ -877,7 +949,7 @@
                 </div>
 
                 <div id="st-application-box"
-                    style="margin-top:3rem; padding:2rem; background:var(--bg); border-radius:24px; border-left:4px solid var(--primary);">
+                    style="margin-top:3rem; padding:2rem; background:var(--bg); border-radius:4px; border-left:4px solid var(--primary);">
                     <h4
                         style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:1rem;">
                         Aplicação Prática</h4>
@@ -907,7 +979,7 @@
         </div>
 
         <button class="btn-zen" id="zen-trigger" onclick="toggleZen()"
-            style="position:fixed; bottom:2rem; right:2rem; background:var(--primary); color:white; width:55px; height:55px; border-radius:50%; border:none; display:none; align-items:center; justify-content:center; font-size:1.5rem; transition:0.3s; box-shadow:var(--shadow);">
+            style="position:fixed; bottom:2rem; right:2rem; background:var(--primary); color:white; width:55px; height:55px; border-radius:4px; border:none; display:none; align-items:center; justify-content:center; font-size:1.5rem; transition:0.3s; box-shadow:none;">
             <i class="bi bi-book"></i>
         </button>
 
@@ -946,9 +1018,49 @@
             });
         }
 
+        function sanitizeQuery(input) {
+            const blackList = [
+                '<script', 'javascript:', 'onerror', 'onload', '<iframe', '<object',
+                'union select', 'drop table', 'truncate', '--', '/*', '*/', '@@@@',
+                'exec(', 'xp_cmdshell', 'document.cookie', 'alert(', 'confirm(', 'prompt('
+            ];
+
+            let clean = input.replace(/<[^>]*>?/gm, ''); // Remove tags HTML
+            const lower = clean.toLowerCase();
+
+            const isMalicious = blackList.some(item => lower.includes(item));
+            if (isMalicious) return null;
+
+            return clean.trim();
+        }
+
         async function performSearch() {
-            const query = document.getElementById('query').value;
+            const rawQuery = document.getElementById('query').value;
+            const version = document.getElementById('bible-version').value;
+            const query = sanitizeQuery(rawQuery);
+
+            if (query === null) {
+                Swal.fire({
+                    title: 'Segurança de Manuscritos',
+                    text: 'A sua pesquisa contém termos ou comandos que não são permitidos por motivos de segurança e integridade da plataforma.',
+                    icon: 'warning',
+                    confirmButtonColor: 'var(--primary)'
+                });
+                return;
+            }
+
             if (!query) return;
+
+            // --- Sistema de Cache Inteligente ---
+            const cacheKey = `study_${query.toLowerCase()}_${version}`;
+            const cachedData = localStorage.getItem(cacheKey);
+            
+            if (cachedData) {
+                const data = JSON.parse(cachedData);
+                console.log('Resultado recuperado do Cache Profundo.');
+                displayResults(data);
+                return;
+            }
 
             document.getElementById('results').style.display = 'none';
             document.getElementById('loader').style.display = 'flex';
@@ -962,39 +1074,41 @@
                     },
                     body: JSON.stringify({
                         query: query,
-                        version: document.getElementById('bible-version').value
+                        version: version
                     })
                 });
 
                 const data = await response.json();
-                console.log('Resposta completa da IA:', data);
-
+                
                 if (!data.answer) {
-                    console.error('Estrutura de resposta inválida:', data);
-                    return;
+                    throw new Error('Resposta incompleta');
                 }
 
-                // Tratar erro de conteúdo banal enviado pela IA
-                if (!response.ok) {
-                    if (response.status === 429) {
-                        Swal.fire({
-                            title: 'Alta Demanda de Sabedoria',
-                            html: 'A biblioteca digital está recebendo muitos acessos no momento. <br><br><small>Por favor, aguarde alguns instantes enquanto liberamos espaço nos manuscritos para sua consulta.</small>',
-                            icon: 'info',
-                            confirmButtonColor: 'var(--primary)',
-                            confirmButtonText: 'Entendido'
-                        });
-                    } else {
-                        throw new Error('Falha na conexão com os manuscritos sagrados.');
-                    }
-                    return;
+                if (response.ok) {
+                    // Guardar em cache se for um sucesso
+                    localStorage.setItem(cacheKey, JSON.stringify(data));
+                    displayResults(data);
+                } else {
+                    handleError(response.status);
                 }
-
-                displayResults(data);
             } catch (error) {
-                console.error('Erro detalhado na conexão:', error);
+                console.error('Erro na conexão:', error);
+                Swal.fire('Erro', 'Não foi possível conectar aos manuscritos agora.', 'error');
             } finally {
                 document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        function handleError(status) {
+            if (status === 429) {
+                Swal.fire({
+                    title: 'Alta Demanda de Sabedoria',
+                    html: 'Muitos pesquisadores estão ativos agora. <br><br><small>Aguarde um momento enquanto renovamos os pergaminhos.</small>',
+                    icon: 'info',
+                    confirmButtonColor: 'var(--primary)'
+                });
+            } else {
+                Swal.fire('Falha Geológica', 'Houve um problema na comunicação teológica.', 'error');
             }
         }
 
@@ -1018,10 +1132,15 @@
             document.getElementById('print-date').innerText = new Date().toLocaleDateString('pt-BR');
 
             document.getElementById('st-title').innerText = ans.summary || 'Estudo Profundo';
-            document.getElementById('st-details').innerHTML = (ans.details || 'Conteúdo em reflexão...').replace(/\n/g,
-                '<br>');
+            
+            // Filtro para remover divisores manuais (--- ou ___) enviados pela IA
+            let detailsHtml = (ans.details || 'Conteúdo em reflexão...')
+                .replace(/[-_]{3,}/g, '') // Remove --- ou ___
+                .replace(/\n/g, '<br>');
+                
+            document.getElementById('st-details').innerHTML = detailsHtml;
             document.getElementById('st-application').innerText = ans.application ||
-            'Aplicação prática em desenvolvimento.';
+                'Aplicação prática em desenvolvimento.';
 
             const verseBox = document.getElementById('st-verses');
             verseBox.innerHTML = '';
@@ -1052,9 +1171,9 @@
             const ytBtn = document.getElementById('yt-search-btn');
             const ytTerm = (ans.summary || 'bíblia') + ' teologia cristã';
             ytBtn.setAttribute('href', `https://www.youtube.com/results?search_query=${encodeURIComponent(ytTerm)}`);
-            ytBtn.onclick = function(e) { 
-                e.preventDefault(); 
-                window.open(this.getAttribute('href'), '_blank'); 
+            ytBtn.onclick = function(e) {
+                e.preventDefault();
+                window.open(this.getAttribute('href'), '_blank');
             };
 
             window.scrollTo({
@@ -1065,7 +1184,7 @@
 
         // --- Proteção Web Anti-DevTools ---
         // 1. Desativar Clique Direito
-       /* document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('contextmenu', event => event.preventDefault());
 
         // 2. Desativar Atalhos comuns (F12, Ctrl+Shift+I, etc)
         document.onkeydown = function(e) {
@@ -1085,7 +1204,7 @@
                 document.body.innerHTML =
                     '<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;font-family:sans-serif;background:#0f172a;color:white;text-align:center;padding:2rem;"><h1>Ambiente Seguro Ativado</h1><p>O uso de ferramentas de diagnóstico não é permitido nesta plataforma.</p><button onclick="location.reload()" style="margin-top:1.5rem;padding:12px 24px;cursor:pointer;background:#6366f1;color:white;border:none;border-radius:4px;font-weight:600;">Recarregar Aplicação</button></div>';
             }
-        }, 1000);*/
+        }, 1000);
 
         function toggleMenuSection(section) {
             const sections = ['daily', 'history', 'favs'];
@@ -1098,9 +1217,12 @@
 
             if (!wasVisible) {
                 target.style.display = 'block';
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
             }
-            
+
             if (section === 'history') renderHistory();
             if (section === 'favs') renderFavorites();
         }
@@ -1398,17 +1520,15 @@
         function createCitationCard() {
             const verse = document.getElementById('daily-verse-text').innerText;
             const ref = document.querySelector('.verse-banner span').innerText;
-            const siteUrl = "bible-study.onrender.com";
-
+            const siteUrl = "{{ parse_url(config('app.url'), PHP_URL_HOST) }}";
             const cardHtml = `
-                <div id="citation-card" style="background:radial-gradient(circle at top right, #2d3748, #1a202c); color:white; padding:4rem 2rem; border-radius:12px; text-align:center; font-family:'Crimson Pro',serif; border:4px double rgba(212,175,55,0.4); box-shadow:0 30px 60px rgba(0,0,0,0.3); width:100%; max-width:450px; margin:0 auto; position:relative; overflow:hidden;">
+                <div id="citation-card" style="background:radial-gradient(circle at top right, #2d3748, #1a202c); color:white; padding:4rem 2rem; border-radius:4px; text-align:center; font-family:'Crimson Pro',serif; border:4px double rgba(212,175,55,0.4); box-shadow:none; width:100%; max-width:450px; margin:0 auto; position:relative; overflow:hidden;">
                     <div style="position:absolute; top:1.5rem; left:50%; transform:translateX(-50%); font-size:0.6rem; text-transform:uppercase; letter-spacing:5px; color:rgba(212,175,55,0.6);">Pérola Sagrada</div>
                     <i class="bi bi-quote" style="font-size:3.5rem; color:#d4af37; opacity:0.8; display:block; margin-bottom:1rem;"></i>
                     <p style="font-size:1.6rem; font-style:italic; line-height:1.2; margin-bottom:2.5rem; font-weight:400; text-shadow:2px 2px 10px rgba(0,0,0,0.5);">${verse}</p>
-                    <div style="display:inline-block; padding:0.6rem 2rem; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); border-radius:100px; color:#d4af37; font-weight:700; text-transform:uppercase; letter-spacing:4px; font-size:0.7rem;">${ref}</div>
+                    <div style="display:inline-block; padding:0.6rem 2rem; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); border-radius:4px; color:#d4af37; font-weight:700; text-transform:uppercase; letter-spacing:4px; font-size:0.7rem;">${ref}</div>
                     
                     <div style="margin-top:4rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:2rem;">
-                        <p style="font-weight:700; letter-spacing:3px; font-size:0.9rem; color:#d4af37;">YULIANO SILVA</p>
                         <p style="font-size:0.6rem; color:rgba(255,255,255,0.4); margin-top:0.5rem; letter-spacing:2px;">${siteUrl}</p>
                     </div>
                 </div>
@@ -1426,12 +1546,14 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     const cardToCapture = document.querySelector('#hidden-card-export #citation-card');
-                    
+
                     Swal.fire({
                         title: 'Gerando Imagem...',
-                        didOpen: () => { Swal.showLoading(); }
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
                     });
-                    
+
                     setTimeout(() => {
                         html2canvas(cardToCapture, {
                             scale: 2,
@@ -1444,7 +1566,8 @@
                             Swal.fire('Sucesso!', 'A imagem foi guardada.', 'success');
                         }).catch(err => {
                             console.error('Html2Canvas Error:', err);
-                            Swal.fire('Erro', 'Não foi possível gerar a imagem fora do modal.', 'error');
+                            Swal.fire('Erro', 'Não foi possível gerar a imagem fora do modal.',
+                                'error');
                         });
                     }, 500);
                 }
