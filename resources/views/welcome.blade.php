@@ -178,16 +178,16 @@
             position: sticky;
             top: 20px;
             z-index: 1000;
-            background: rgba(var(--card-bg), 0.8);
-            backdrop-filter: blur(10px);
+            background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 100px;
             display: flex;
             align-items: center;
-            padding: 0.4rem;
+            padding: 0.35rem;
             margin-bottom: 3.5rem;
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 45px -10px rgba(0,0,0,0.1);
             transition: 0.4s;
+            max-width: 100%;
         }
 
         .search-pill:focus-within {
@@ -205,6 +205,7 @@
             outline: none;
             border-right: 1px solid var(--border);
             cursor: pointer;
+            flex-shrink: 0;
         }
 
         .search-pill input {
@@ -215,6 +216,7 @@
             font-size: 1.1rem;
             color: var(--text);
             outline: none;
+            min-width: 0;
         }
 
         .btn-study {
@@ -230,6 +232,7 @@
             font-size: 1.2rem;
             cursor: pointer;
             transition: 0.3s;
+            flex-shrink: 0;
         }
 
         .btn-study:hover {
@@ -613,18 +616,77 @@
         }
 
         /* Premium Navbar */
-        .premium-nav { position:fixed; top:0; left:0; right:0; z-index:2000; background:rgba(var(--card-bg), 0.7); backdrop-filter:blur(15px); border-bottom:1px solid var(--border); padding:0.8rem 2rem; display:flex; justify-content:space-between; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,0.03); }
+        .premium-nav { position:fixed; top:0; left:0; right:0; z-index:2000; background:rgba(var(--card-bg), 0.85); backdrop-filter:blur(15px); border-bottom:1px solid var(--border); padding:0.8rem 1.5rem; display:flex; justify-content:space-between; align-items:center; }
         .nav-logo { font-weight:800; font-size:1rem; letter-spacing:-1px; color:var(--primary); text-transform:uppercase; }
-        .nav-links { display:flex; gap:1.5rem; align-items:center; }
-        .nav-link { font-size:0.7rem; text-transform:uppercase; letter-spacing:2px; font-weight:700; color:var(--muted); cursor:pointer; transition:0.3s; text-decoration:none; }
+        .nav-links { display:flex; gap:1.2rem; align-items:center; }
+        .nav-link { font-size:0.65rem; text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--muted); cursor:pointer; }
         .nav-link:hover { color:var(--primary); }
-        .nav-link.active { color:var(--primary); border-bottom:2px solid var(--primary); padding-bottom:4px; }
 
         @media (max-width: 600px) {
-            .premium-nav { padding:0.8rem 1.2rem; }
-            .nav-links { gap:1rem; }
-            .nav-link { font-size:0.6rem; letter-spacing:1px; }
+            .premium-nav { padding:0.6rem 1rem; }
+            .nav-links { gap:0.8rem; }
+            .nav-link { font-size:0.6rem; letter-spacing:0.5px; }
             .nav-logo { display:none; }
+            .container { padding:0.8rem; }
+            .search-pill { 
+                padding: 0.25rem; 
+                border-radius: 100px; 
+                width: 100% !important; 
+                box-sizing: border-box; 
+            }
+            .search-pill select { 
+                padding: 0 0.5rem; 
+                width: 65px; 
+                font-size: 0.65rem; 
+                border-right: 1px solid var(--border);
+            }
+            .search-pill input { 
+                font-size: 0.95rem; 
+                padding: 0.6rem 0.5rem; 
+            }
+            .btn-study { 
+                width: 44px; 
+                height: 44px; 
+                min-width: 44px; 
+                font-size: 1rem;
+            }
+        }
+
+        /* Zen Mode (Modo Leitura) */
+        body.zen-active .premium-nav,
+        body.zen-active .search-pill,
+        body.zen-active .daily-section,
+        body.zen-active footer,
+        body.zen-active .section-header,
+        body.zen-active #st-suggestions,
+        body.zen-active #st-videos-container,
+        body.zen-active header {
+            display: none !important;
+        }
+
+        body.zen-active .container {
+            padding-top: 2rem !important;
+            max-width: 900px !important;
+        }
+
+        body.zen-active .study-card {
+            box-shadow: none !important;
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+        body.zen-active #st-title {
+            text-align: center;
+            border: none;
+            padding: 0;
+            font-size: 3.5rem;
+            margin-bottom: 4rem;
+        }
+
+        body.zen-active #st-details {
+            font-size: 1.5rem;
+            line-height: 2;
         }
 
         @media print {
@@ -794,6 +856,8 @@
                 <div style="margin:2rem 0; border-top:1px solid #000; border-bottom:1px solid #000; padding:1rem 0;">
                     <p><strong>Pesquisador:</strong> Yuliano Silva</p>
                     <p><strong>Data de Emissão:</strong> <span id="print-date"></span></p>
+                    <div id="print-qrcode" style="margin:2rem auto; display:flex; justify-content:center;"></div>
+                    <p id="print-url" style="font-size:0.7rem; color:#666; display:none;"></p>
                 </div>
             </div>
 
@@ -829,9 +893,6 @@
                     </button>
                     <button id="btn-fav" class="btn-premium">
                         <i class="bi bi-star"></i> Favoritar
-                    </button>
-                    <button class="btn-premium" onclick="copyStudy()">
-                        <i class="bi bi-share"></i> Compartilhar
                     </button>
                 </div>
 
@@ -1134,9 +1195,13 @@
             const app = document.getElementById('st-application').innerText;
             const textToRead = `${title}. ${details}. Aplicação Prática: ${app}`;
 
+            // iOS/Safari unlock
+            window.speechSynthesis.resume();
+
             speechInstance = new SpeechSynthesisUtterance(textToRead);
             speechInstance.lang = 'pt-BR';
             speechInstance.rate = 1.0;
+            speechInstance.pitch = 1.0;
 
             speechInstance.onstart = () => {
                 isSpeaking = true;
@@ -1144,7 +1209,8 @@
                 btn.classList.add('btn-report');
             };
 
-            speechInstance.onerror = () => {
+            speechInstance.onerror = (e) => {
+                console.error('Speech Error:', e);
                 isSpeaking = false;
                 btn.innerHTML = '<i class="bi bi-volume-up"></i> Ouvir Estudo';
                 btn.classList.remove('btn-report');
@@ -1267,9 +1333,9 @@
         function generateReport() {
             try {
                 const qrContainer = document.getElementById('print-qrcode');
-                qrContainer.innerHTML = '';
+                if (qrContainer) qrContainer.innerHTML = '';
 
-                if (typeof QRCode !== 'undefined') {
+                if (typeof QRCode !== 'undefined' && qrContainer) {
                     new QRCode(qrContainer, {
                         text: window.location.href,
                         width: 128,
@@ -1279,12 +1345,16 @@
                         correctLevel: QRCode.CorrectLevel.H
                     });
                 }
-                document.getElementById('print-url').innerText = window.location.href;
-                document.getElementById('print-url').style.display = 'block';
+                const urlElem = document.getElementById('print-url');
+                if (urlElem) {
+                    urlElem.innerText = window.location.href;
+                    urlElem.style.display = 'block';
+                }
             } catch (e) {
                 console.error('Erro QR Code:', e);
             }
 
+            document.getElementById('print-date').innerText = new Date().toLocaleDateString('pt-BR');
             setTimeout(() => {
                 window.print();
             }, 500);
