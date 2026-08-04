@@ -15,6 +15,7 @@ O projecto é mantido pela comunidade e está aberto a contribuições — novas
 - [Stack tecnológica](#stack-tecnológica)
 - [Arquitectura](#arquitectura)
 - [Endpoint da API](#endpoint-da-api)
+- [Filas (Queue)](#filas-queue)
 - [Pré-requisitos](#pré-requisitos)
 - [Instalação local](#instalação-local)
 - [Variáveis de ambiente](#variáveis-de-ambiente)
@@ -120,6 +121,7 @@ O fluxo de uma pesquisa segue cinco passos principais, orquestrados pelo `BibleC
 - `Topic` — tema teológico (`name`, `slug`) — N:N com `Verse`
 - `Commentary` — comentário associado a um versículo
 - `PdfContent` — conteúdo extraído de PDFs (suporte a futuro RAG)
+- `QueryLog` — analytics de cada pesquisa (tema, intenção, provedor de IA, sucesso, duração), gravado em segundo plano (ver [Filas](#filas-queue))
 - `User` — autenticação Sanctum
 
 ---
@@ -156,6 +158,26 @@ O fluxo de uma pesquisa segue cinco passos principais, orquestrados pelo `BibleC
   "study_plan": { /* presente apenas quando intent = study_plan */ }
 }
 ```
+
+---
+
+## Filas (Queue)
+
+A aplicação usa filas para gerar analytics de cada pesquisa (tema, intenção, qual provedor de IA respondeu — Gemini, OpenAI ou o fallback offline — e tempo de resposta) **sem atrasar a resposta ao utilizador**. Estes dados ficam guardados na tabela `query_logs`.
+
+O ponto importante: como a app está hospedada no Render como **um único serviço web**, não há um processo `queue:work`/`queue:listen` persistente em produção. Por isso o job `App\Jobs\LogBibleQueryJob` é sempre despachado explicitamente na conexão `background`:
+
+```php
+LogBibleQueryJob::dispatch(...)->onConnection('background');
+```
+
+A conexão `background` (introduzida no Laravel 13, ver `config/queue.php`) executa o job num **processo PHP separado, gerado logo depois de a resposta HTTP já ter sido enviada ao cliente** — sem precisar de nenhum worker a correr em segundo plano. Isto significa:
+
+- Nenhuma configuração extra é necessária no Render — continua a ser um único serviço web ("deixar como está").
+- O tempo de resposta do endpoint `/api/query` não é afectado pelo registo de analytics.
+- Não há filas "penduradas": se o registo falhar, o pior cenário é perder aquela entrada de log — a resposta ao utilizador já foi entregue e não depende disto.
+
+Se no futuro forem adicionados jobs que **precisem** de retries garantidos, agendamento ou processamento pesado (ex.: reprocessar PDFs em lote), a recomendação é usar a conexão `database` (já configurada e com as tabelas `jobs`, `job_batches` e `failed_jobs` migradas) e correr um worker dedicado — nesse caso sim seria necessário um serviço/worker adicional no Render. Localmente, `composer run dev` já arranca `php artisan queue:listen` para processar esses jobs durante o desenvolvimento.
 
 ---
 

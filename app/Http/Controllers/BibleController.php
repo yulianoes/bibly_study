@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use App\Jobs\LogBibleQueryJob;
 use App\Services\BibleSearchService;
 use App\Services\IntentDetectionService;
 use App\Services\AiExplanationService;
@@ -36,6 +37,7 @@ class BibleController extends Controller
         ]);
 
         $query = $request->input('query');
+        $startedAt = microtime(true);
 
         // 1. Limpar o tema: só chama a IA para limpar frases longas (> 3 palavras)
         $words = explode(' ', trim($query));
@@ -88,6 +90,19 @@ class BibleController extends Controller
 
         // 10. Cache desativado para evitar erros de base de dados em instâncias read-only
         \Log::info("✓ Resposta gerada com sucesso para: '{$theme}'");
+
+        // 11. Regista analytics da pesquisa na conexão 'background' (Laravel 13):
+        // o job corre num processo PHP separado APÓS a resposta já ter sido
+        // enviada ao cliente, sem exigir um worker (`queue:work`) persistente.
+        // Isto permite manter o deploy no Render como um único serviço web.
+        LogBibleQueryJob::dispatch(
+            query: $query,
+            theme: $theme,
+            intent: $intent,
+            aiProvider: $this->aiService->getLastProvider(),
+            success: $this->aiService->getLastProvider() !== 'offline',
+            durationMs: (int) round((microtime(true) - $startedAt) * 1000),
+        )->onConnection('background');
 
         return response()->json($response);
     }

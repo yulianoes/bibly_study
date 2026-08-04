@@ -14,6 +14,18 @@ class AiExplanationService
     ];
 
     /**
+     * Provedor que respondeu ao último pedido de generate(): 'gemini',
+     * 'openai' ou 'offline'. Usado apenas para telemetria (ver
+     * LogBibleQueryJob), não afecta a resposta devolvida ao cliente.
+     */
+    private string $lastProvider = 'offline';
+
+    public function getLastProvider(): string
+    {
+        return $this->lastProvider;
+    }
+
+    /**
      * Extrai as palavras-chave principais de uma pergunta do utilizador.
      */
     public function extractKeywords(string $query): string
@@ -51,6 +63,8 @@ class AiExplanationService
     {
         $geminiKey = env('GEMINI_API_KEY');
         $openaiKey = env('OPENAI_API_KEY');
+
+        $this->lastProvider = 'offline';
 
         \Log::info("AI Request para tema: '{$query}'");
 
@@ -95,6 +109,7 @@ class AiExplanationService
                         $text = $response->json('candidates.0.content.parts.0.text');
                         if ($text) {
                             \Log::info("✓ Sucesso com modelo '{$model}' para tema '{$query}'");
+                            $this->lastProvider = 'gemini';
                             return $text;
                         }
                         \Log::warning("Modelo '{$model}' respondeu mas sem texto.");
@@ -126,6 +141,7 @@ class AiExplanationService
                         'response_format' => ['type' => 'json_object']
                     ]);
                 if ($response->successful()) {
+                    $this->lastProvider = 'openai';
                     return $response->json()['choices'][0]['message']['content'];
                 }
             } catch (\Exception $e) {
@@ -135,6 +151,7 @@ class AiExplanationService
 
         // --- BACKUP OFFLINE RICO ---
         \Log::warning("Usando backup offline para '{$query}'.");
+        $this->lastProvider = 'offline';
         return $this->generateOfflineFallback($query);
     }
 
