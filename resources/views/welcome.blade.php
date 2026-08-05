@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Bible Intelligent Study</title>
 
     <link rel="canonical" href="{{ config('app.url') }}">
@@ -23,11 +23,13 @@
     <meta property="og:type" content="website">
 
     <!-- PWA & Mobile Optimization -->
-    <meta name="theme-color" content="#92754d">
+    <meta name="theme-color" content="#92754d" id="theme-color-meta">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Bible Study">
-    <link rel="apple-touch-icon" href="/favicon.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png">
     <link rel="manifest" href="/manifest.json">
 
     <!-- JSON-LD Structured Data for Google -->
@@ -51,7 +53,8 @@
     }
     </script>
 
-    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -718,6 +721,123 @@
             }
         }
 
+        /* PWA Install Banner */
+        .pwa-install-banner {
+            position: fixed;
+            left: 1rem;
+            right: 1rem;
+            bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+            z-index: 3000;
+            max-width: 560px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.35);
+            padding: 1rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateY(150%);
+            opacity: 0;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .pwa-install-banner.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .pwa-install-banner-icon {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 4px;
+            background: var(--primary-glow);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .pwa-install-banner-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .pwa-install-banner-text strong {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+
+        .pwa-install-banner-text span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 0.15rem;
+        }
+
+        .pwa-install-banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        #pwa-install-btn {
+            padding: 0.6rem 1.1rem;
+            font-size: 0.7rem;
+        }
+
+        .pwa-dismiss-btn {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.4rem;
+            line-height: 1;
+        }
+
+        .pwa-dismiss-btn:hover {
+            color: var(--text);
+        }
+
+        .nav-link.pwa-nav-install {
+            display: none;
+            align-items: center;
+            gap: 0.35rem;
+            color: var(--primary);
+        }
+
+        .nav-link.pwa-nav-install.visible {
+            display: inline-flex;
+        }
+
+        @media (max-width: 600px) {
+            .pwa-install-banner {
+                left: 0.6rem;
+                right: 0.6rem;
+                bottom: calc(0.6rem + env(safe-area-inset-bottom, 0px));
+                padding: 0.9rem 1rem;
+                flex-wrap: wrap;
+            }
+
+            .pwa-install-banner-text {
+                order: 1;
+                width: calc(100% - 60px);
+            }
+
+            .pwa-install-banner-actions {
+                order: 2;
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: 0.6rem;
+            }
+        }
+
         /* Zen Mode (Modo Leitura) */
         body.zen-active .premium-nav,
         body.zen-active .search-pill,
@@ -726,6 +846,7 @@
         body.zen-active .section-header,
         body.zen-active #st-suggestions,
         body.zen-active #st-videos-container,
+        body.zen-active #pwa-install-banner,
         body.zen-active header {
             display: none !important;
         }
@@ -848,10 +969,29 @@
             <span class="nav-link" onclick="toggleMenuSection('daily')">Temas</span>
             <span class="nav-link" onclick="toggleMenuSection('history')">Histórico</span>
             <span class="nav-link" onclick="toggleMenuSection('favs')">Favoritos</span>
+            <span class="nav-link pwa-nav-install" id="pwa-nav-install" onclick="triggerPwaInstall()">
+                <i class="bi bi-download"></i> <span id="pwa-nav-install-label">Instalar</span>
+            </span>
             <button class="theme-toggle" id="theme-toggle" style="width:35px; height:35px; border-radius:4px;"><i
                     class="bi bi-sun"></i></button>
         </div>
     </nav>
+
+    <div id="pwa-install-banner" class="pwa-install-banner" role="dialog" aria-live="polite">
+        <div class="pwa-install-banner-icon"><i class="bi bi-phone"></i></div>
+        <div class="pwa-install-banner-text">
+            <strong>Instalar Bible Intelligent Study</strong>
+            <span id="pwa-install-banner-desc">Acesso rápido no ecrã inicial, em tela cheia.</span>
+        </div>
+        <div class="pwa-install-banner-actions">
+            <button id="pwa-install-btn" class="btn-premium btn-report" onclick="triggerPwaInstall()">
+                Instalar
+            </button>
+            <button class="pwa-dismiss-btn" onclick="dismissPwaBanner()" aria-label="Fechar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    </div>
 
     <div class="container" style="padding-top:6rem;">
 
@@ -996,19 +1136,23 @@
     <script>
         const themeToggle = document.getElementById('theme-toggle');
         const html = document.documentElement;
+        const themeColorMeta = document.getElementById('theme-color-meta');
+        const THEME_COLORS = { light: '#92754d', dark: '#0f172a' };
+
+        function applyTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            themeToggle.innerHTML = theme === 'light' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon"></i>';
+            if (themeColorMeta) themeColorMeta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.light);
+        }
 
         themeToggle.addEventListener('click', () => {
             const currentTheme = html.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            html.setAttribute('data-theme', newTheme);
-            themeToggle.innerHTML = newTheme === 'light' ? '<i class="bi bi-sun"></i>' :
-                '<i class="bi bi-moon"></i>';
+            applyTheme(newTheme);
             localStorage.setItem('theme', newTheme);
         });
 
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        html.setAttribute('data-theme', savedTheme);
-        themeToggle.innerHTML = savedTheme === 'light' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon"></i>';
+        applyTheme(localStorage.getItem('theme') || 'light');
 
         function searchFromLink(text) {
             document.getElementById('query').value = text;
@@ -1578,6 +1722,106 @@
         // --- Inicialização ---
         renderHistory();
         renderFavorites();
+    </script>
+    <script>
+        // --- PWA: botão de instalação (Android/Desktop via beforeinstallprompt,
+        // instruções manuais no iOS, que não suporta esse evento) ---
+        (function () {
+            const banner = document.getElementById('pwa-install-banner');
+            const bannerDesc = document.getElementById('pwa-install-banner-desc');
+            const navInstall = document.getElementById('pwa-nav-install');
+            const navInstallLabel = document.getElementById('pwa-nav-install-label');
+            const DISMISS_KEY = 'pwa_install_dismissed_at';
+            const DISMISS_DAYS = 7;
+
+            let deferredPrompt = null;
+
+            const isStandalone = () =>
+                window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+            const isIos = () => /iphone|ipad|ipod/i.test(window.navigator.userAgent) && !window.MSStream;
+            const isMobile = () =>
+                /android|iphone|ipad|ipod|mobile/i.test(window.navigator.userAgent) ||
+                window.matchMedia('(pointer: coarse)').matches;
+
+            function wasDismissedRecently() {
+                const dismissedAt = parseInt(localStorage.getItem(DISMISS_KEY) || '0', 10);
+                if (!dismissedAt) return false;
+                return (Date.now() - dismissedAt) / 86400000 < DISMISS_DAYS;
+            }
+
+            function showInstallUi() {
+                bannerDesc.textContent = isIos()
+                    ? 'No Safari: toque em Partilhar e depois em "Adicionar ao Ecrã Principal".'
+                    : (isMobile()
+                        ? 'Acesso rápido no ecrã inicial, em tela cheia, sem a barra do navegador.'
+                        : 'Instale no computador para acesso rápido, como uma aplicação nativa.');
+                navInstallLabel.textContent = isMobile() ? 'Instalar App' : 'Instalar no PC';
+
+                navInstall.classList.add('visible');
+                if (!wasDismissedRecently()) {
+                    banner.classList.add('visible');
+                }
+            }
+
+            function hideInstallUi() {
+                banner.classList.remove('visible');
+                navInstall.classList.remove('visible');
+            }
+
+            window.dismissPwaBanner = function () {
+                banner.classList.remove('visible');
+                localStorage.setItem(DISMISS_KEY, Date.now().toString());
+            };
+
+            window.triggerPwaInstall = async function () {
+                if (deferredPrompt) {
+                    banner.classList.remove('visible');
+                    deferredPrompt.prompt();
+                    const choice = await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    if (choice.outcome === 'accepted') {
+                        hideInstallUi();
+                    }
+                    return;
+                }
+
+                if (isIos()) {
+                    Swal.fire({
+                        title: 'Instalar no iPhone/iPad',
+                        html: 'No Safari, toque no ícone <strong>Partilhar</strong> <i class="bi bi-box-arrow-up"></i> e depois em <strong>"Adicionar ao Ecrã Principal"</strong>.',
+                        icon: 'info',
+                        confirmButtonColor: 'var(--primary)'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Instalação não disponível agora',
+                    text: 'O seu navegador ainda não ofereceu a opção de instalação. Verifique o menu do navegador (⋮) e procure "Instalar app" ou "Adicionar ao ecrã principal".',
+                    icon: 'info',
+                    confirmButtonColor: 'var(--primary)'
+                });
+            };
+
+            if (!isStandalone()) {
+                window.addEventListener('beforeinstallprompt', (event) => {
+                    event.preventDefault();
+                    deferredPrompt = event;
+                    showInstallUi();
+                });
+
+                // Safari no iOS nunca dispara 'beforeinstallprompt' — mostramos
+                // desde já as instruções manuais para o utilizador poder instalar.
+                if (isIos()) {
+                    showInstallUi();
+                }
+            }
+
+            window.addEventListener('appinstalled', () => {
+                hideInstallUi();
+                localStorage.removeItem(DISMISS_KEY);
+            });
+        })();
     </script>
     <script>
         if ('serviceWorker' in navigator) {
