@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\Pool;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
 class AiExplanationService
@@ -12,6 +14,14 @@ class AiExplanationService
         'gemini-2.0-flash-lite',
         'gemini-flash-latest',
     ];
+
+    /**
+     * Tempo máximo (segundos) de espera por uma resposta de um único
+     * modelo. Mantido baixo porque os modelos são chamados em paralelo
+     * (ver generate()) — este valor passa a ser, na prática, o tempo
+     * máximo total de espera pela IA, não a soma de várias tentativas.
+     */
+    private const REQUEST_TIMEOUT = 15;
 
     /**
      * Provedor que respondeu ao último pedido de generate(): 'gemini',
@@ -27,27 +37,15 @@ class AiExplanationService
 
     /**
      * Extrai as palavras-chave principais de uma pergunta do utilizador.
+     *
+     * Propositadamente NÃO chama nenhuma API de IA: é apenas uma limpeza
+     * local por regex. Fazer isto via IA custava uma chamada de rede
+     * extra (até ~8s) ANTES de sequer começar a gerar o estudo,
+     * praticamente duplicando o tempo total de resposta em pesquisas com
+     * frases mais longas. Esta versão é instantânea.
      */
     public function extractKeywords(string $query): string
     {
-        $geminiKey = env('GEMINI_API_KEY');
-        $prompt = "Extraia APENAS as palavras-chave do tema bíblico a seguir, removendo verbos de comando como 'leia', 'explique', 'quero entender'. Retorne somente os termos essenciais separados por espaço, sem pontuação. Pergunta: {$query}";
-
-        if ($geminiKey) {
-            // Usa apenas o modelo mais rápido e leve para extração de keywords
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={$geminiKey}";
-            try {
-                $response = Http::withoutVerifying()->timeout(8)->post($url, [
-                    'contents' => [['parts' => [['text' => $prompt]]]]
-                ]);
-                if ($response->successful()) {
-                    $text = $response->json('candidates.0.content.parts.0.text');
-                    if ($text) return trim($text);
-                }
-            } catch (\Exception $e) {}
-        }
-
-        // Fallback manual robusto
         $stopWords = ['leia', 'explique', 'explicar', 'quem', 'foi', 'sobre', 'entender',
                       'quero', 'podes', 'fale', 'me', 'nos', 'estudo', 'falar', 'saiba',
                       'significa', 'o que', 'como', 'por que', 'porque', 'qual'];
@@ -80,48 +78,58 @@ class AiExplanationService
         7. 'application': aplicação prática para a vida cristã hoje.
         8. 'suggestions': array com 4 temas bíblicos relacionados para aprofundamento.";
 
-        // --- GEMINI: Cascata com backoff exponencial ---
+        // --- GEMINI: os 3 modelos são chamados EM PARALELO (não em cascata) ---
+        // Cada modelo tem quota própria na API do Gemini, por isso não há
+        // vantagem em esperar (sleep) entre tentativas — isso só somava
+        // segundos ao tempo de resposta sem melhorar a taxa de sucesso.
+        // Ao disparar os 3 de uma vez, o tempo total passa a ser o de UM
+        // único pedido (o mais lento), em vez da soma de três.
         if ($geminiKey) {
-            $delay = 0; // segundos de espera entre tentativas
+            try {
+                $responses = Http::pool(fn (Pool $pool) => array_map(
+                    fn (string $model) => $pool->as($model)
+                        ->withoutVerifying()
+                        ->timeout(self::REQUEST_TIMEOUT)
+                        ->post(
+                            "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$geminiKey}",
+                            [
+                                'contents' => [
+                                    ['parts' => [['text' => "Tema para estudo bíblico profundo: {$query}"]]]
+                                ],
+                                'system_instruction' => [
+                                    'parts' => [['text' => $systemPrompt]]
+                                ],
+                                'generationConfig' => [
+                                    'response_mime_type' => 'application/json',
+                                    'temperature' => 0.7,
+                                ]
+                            ]
+                        ),
+                    $this->models
+                ));
+            } catch (\Exception $e) {
+                \Log::error('Exceção ao disparar pedidos concorrentes ao Gemini: ' . $e->getMessage());
+                $responses = [];
+            }
 
-            foreach ($this->models as $index => $model) {
-                if ($delay > 0) {
-                    \Log::info("Aguardando {$delay}s antes de tentar '{$model}'...");
-                    sleep($delay);
+            foreach ($this->models as $model) {
+                $response = $responses[$model] ?? null;
+
+                if (! $response instanceof Response) {
+                    \Log::warning("Falha de conexão em '{$model}'.");
+                    continue;
                 }
 
-                try {
-                    $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$geminiKey}";
-                    $response = Http::withoutVerifying()->timeout(30)->post($url, [
-                        'contents' => [
-                            ['parts' => [['text' => "Tema para estudo bíblico profundo: {$query}"]]]
-                        ],
-                        'system_instruction' => [
-                            'parts' => [['text' => $systemPrompt]]
-                        ],
-                        'generationConfig' => [
-                            'response_mime_type' => 'application/json',
-                            'temperature' => 0.7,
-                        ]
-                    ]);
-
-                    if ($response->successful()) {
-                        $text = $response->json('candidates.0.content.parts.0.text');
-                        if ($text) {
-                            \Log::info("✓ Sucesso com modelo '{$model}' para tema '{$query}'");
-                            $this->lastProvider = 'gemini';
-                            return $text;
-                        }
-                        \Log::warning("Modelo '{$model}' respondeu mas sem texto.");
-                    } elseif ($response->status() === 429) {
-                        $delay = ($index + 1) * 2; // backoff: 2s, 4s, 6s...
-                        \Log::warning("429 em '{$model}'. Próximo em {$delay}s...");
-                    } else {
-                        \Log::warning("Erro {$response->status()} em '{$model}'. Tentando próximo...");
+                if ($response->successful()) {
+                    $text = $response->json('candidates.0.content.parts.0.text');
+                    if ($text) {
+                        \Log::info("✓ Sucesso com modelo '{$model}' para tema '{$query}'");
+                        $this->lastProvider = 'gemini';
+                        return $text;
                     }
-
-                } catch (\Exception $e) {
-                    \Log::error("Exceção em '{$model}': " . $e->getMessage());
+                    \Log::warning("Modelo '{$model}' respondeu mas sem texto.");
+                } else {
+                    \Log::warning("Erro {$response->status()} em '{$model}'.");
                 }
             }
 
@@ -131,7 +139,7 @@ class AiExplanationService
         // --- OPENAI (backup secundário) ---
         if ($openaiKey && $openaiKey !== 'sua_chave_aqui') {
             try {
-                $response = Http::withoutVerifying()->withToken($openaiKey)->timeout(30)
+                $response = Http::withoutVerifying()->withToken($openaiKey)->timeout(self::REQUEST_TIMEOUT)
                     ->post('https://api.openai.com/v1/chat/completions', [
                         'model' => 'gpt-4o-mini',
                         'messages' => [
